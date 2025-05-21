@@ -7,15 +7,15 @@
 #include <TComplex.h>
 #include <TMath.h>
 
-constexpr double R_1 = 9.99E+02;
-constexpr double L_1 = 5.34E-02;
-constexpr double C_1 = 1.01E-08;
-constexpr double R_L2 = 2.05E+02;
-constexpr double R_2 = 1.50E+03;
-constexpr double C_2 = 1.01E-08;
-constexpr double L_2 = 4.64E-02;
-constexpr double V_0 = 2.5;
-constexpr double R_gen = 50;
+constexpr double R_1{9.99E+02};
+constexpr double L_1{5.34E-02};
+constexpr double C_1{1.01E-08};
+constexpr double R_L2{2.05E+02};
+constexpr double R_2{1.50E+03};
+constexpr double C_2{1.01E-08};
+constexpr double L_2{4.64E-02};
+constexpr double V_0{2.5};
+constexpr double R_gen{50};
 
 double V_S(double *f, double *par)
 {
@@ -140,10 +140,10 @@ void plotAmplitude()
     TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
     // leggi i file di dati con errori su x e y
-    TGraphErrors *g_source = new TGraphErrors("V_source.txt", "%lg %lg %lg");
-    TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg");
-    TGraphErrors *g_tweeter = new TGraphErrors("V_tweeter.txt", "%lg %lg %lg");
-    TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg");
+    TGraphErrors *g_source = new TGraphErrors("V_source.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_tweeter = new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
     g_source->SetMarkerStyle(20);
@@ -178,17 +178,13 @@ void plotAmplitude()
 
     // colori e stile linea
     f_S->SetLineColor(kRed + 1);
-    f_S->SetLineWidth(4);
-    f_S->SetLineStyle(2);
+    f_S->SetLineWidth(3);
     f_W->SetLineColor(kBlue + 1);
-    f_W->SetLineWidth(4);
-    f_W->SetLineStyle(2);
+    f_W->SetLineWidth(3);
     f_T->SetLineColor(kGreen + 1);
-    f_T->SetLineWidth(4);
-    f_T->SetLineStyle(2);
+    f_T->SetLineWidth(3);
     f_M->SetLineColor(kMagenta + 1);
-    f_M->SetLineWidth(4);
-    f_M->SetLineStyle(2);
+    f_M->SetLineWidth(3);
 
     // parametri delle funzioni
     f_S->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
@@ -199,6 +195,8 @@ void plotAmplitude()
     f_W->SetParNames("R_1", "L_1");
     f_T->SetParNames("R_1", "C_1");
     f_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
+    f_W->SetParLimits(0, R_1 - 5 * 0.55, R_1 + 5 * 0.55);
+    f_W->SetParLimits(1, L_1 - 5 * 5.3e-4, L_1 + 5 * 5.3e-4);
 
     // fit
     g_source->Fit(f_S);
@@ -234,10 +232,10 @@ void plotPhase()
     TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
     // leggi i file di dati con errori su x e y
-    TGraphErrors *p_source = new TGraphErrors("P_source.txt", "%lg %lg %lg");
-    TGraphErrors *p_woofer = new TGraphErrors("P_woofer.txt", "%lg %lg %lg");
-    TGraphErrors *p_tweeter = new TGraphErrors("P_tweeter.txt", "%lg %lg %lg");
-    TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg");
+    TGraphErrors *p_source = new TGraphErrors("P_source.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_woofer = new TGraphErrors("P_woofer.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_tweeter = new TGraphErrors("P_tweeter.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
     p_source->SetMarkerStyle(20);
@@ -246,7 +244,7 @@ void plotPhase()
     p_mid->SetMarkerStyle(20);
     p_source->SetMarkerColor(kRed);
     p_woofer->SetMarkerColor(kBlue);
-    p_tweeter->SetMarkerColor(kGreen + 2);
+    p_tweeter->SetMarkerColor(kGreen);
     p_mid->SetMarkerColor(kMagenta);
 
     // titoli e assi
@@ -268,24 +266,29 @@ void plotPhase()
     TF1 *phase_M = new TF1("phase_M", p_M, fmin, fmax, 4);
 
     // colori e stile linea
-    phase_S->SetLineColor(kRed);
-    phase_S->SetLineWidth(4);
-    phase_S->SetLineStyle(2);
-    phase_W->SetLineColor(kBlue);
-    phase_W->SetLineWidth(4);
-    phase_W->SetLineStyle(2);
-    phase_T->SetLineColor(kGreen + 2);
-    phase_T->SetLineWidth(4);
-    phase_T->SetLineStyle(2);
-    phase_M->SetLineColor(kMagenta);
-    phase_M->SetLineWidth(4);
-    phase_M->SetLineStyle(2);
+    phase_S->SetLineColor(kRed + 1);
+    phase_S->SetLineWidth(3);
+    phase_W->SetLineColor(kBlue + 1);
+    phase_W->SetLineWidth(3);
+    phase_T->SetLineColor(kGreen + 1);
+    phase_T->SetLineWidth(3);
+    phase_M->SetLineColor(kMagenta + 1);
+    phase_M->SetLineWidth(3);
 
     // parametri delle funzioni
     phase_S->SetParameters(0.);
     phase_W->SetParameters(R_1, L_1);
     phase_T->SetParameters(R_1, C_1);
     phase_M->SetParameters(R_2, R_L2, L_2, C_2);
+    phase_W->SetParNames("R_1", "L_1");
+    phase_T->SetParNames("R_1", "C_1");
+    phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
+
+    // fit
+    p_source->Fit(phase_S);
+    p_woofer->Fit(phase_W);
+    p_tweeter->Fit(phase_T);
+    p_mid->Fit(phase_M);
 
     // disegna le funzioni sullo stesso grafico
     phase_S->Draw("same");
