@@ -85,6 +85,15 @@ double p_W(double *f, double *par)
     return deg(-atan2(L * W, R));
 }
 
+double p_T(double *f, double *par)
+{
+    double W = 2 * TMath::Pi() * f[0];
+    double R = par[0];
+    double C = par[1];
+
+    return deg(atan2(1 / (C * W), R));
+}
+
 double p_M(double *f, double *par)
 {
     double W = 2 * TMath::Pi() * f[0];
@@ -94,15 +103,6 @@ double p_M(double *f, double *par)
     double C = par[3];
 
     return deg(-atan2(W * L - 1 / (W * C), R + RL));
-}
-
-double p_T(double *f, double *par)
-{
-    double W = 2 * TMath::Pi() * f[0];
-    double R = par[0];
-    double C = par[1];
-
-    return deg(atan2(1, C * W * R));
 }
 
 /*double sourceTF(double *x, double *par)
@@ -248,8 +248,9 @@ void plotPhase()
     p_mid->SetMarkerColor(kMagenta);
 
     // titoli e assi
-    p_source->SetTitle("Filtro CrossOver;Frequency [Hz];#Delta V [V]");
-    p_source->SetMinimum(0);
+    p_source->SetTitle("Filtro CrossOver;Frequency [Hz];Phase [deg]");
+    p_source->SetMinimum(-90);
+    p_source->SetMaximum(90);
     p_source->Draw("APE"); // primo grafico in canvas
     p_woofer->Draw("PE same");
     p_tweeter->Draw("PE same");
@@ -260,14 +261,14 @@ void plotPhase()
     double fmax = p_source->GetXaxis()->GetXmax();
 
     // TF1 per le funzioni (stile linea, senza marker)
-    TF1 *phase_S = new TF1("phase_S", "pol0", fmin, fmax, 1);
+    // TF1 *phase_S = new TF1("phase_S", "[0]", fmin, fmax, 1);
     TF1 *phase_W = new TF1("phase_W", p_W, fmin, fmax, 2);
     TF1 *phase_T = new TF1("phase_T", p_T, fmin, fmax, 2);
     TF1 *phase_M = new TF1("phase_M", p_M, fmin, fmax, 4);
 
     // colori e stile linea
-    phase_S->SetLineColor(kRed + 1);
-    phase_S->SetLineWidth(3);
+    // phase_S->SetLineColor(kRed + 1);
+    // phase_S->SetLineWidth(3);
     phase_W->SetLineColor(kBlue + 1);
     phase_W->SetLineWidth(3);
     phase_T->SetLineColor(kGreen + 1);
@@ -276,7 +277,7 @@ void plotPhase()
     phase_M->SetLineWidth(3);
 
     // parametri delle funzioni
-    phase_S->SetParameters(0.);
+    // phase_S->SetParameters(0.);
     phase_W->SetParameters(R_1, L_1);
     phase_T->SetParameters(R_1, C_1);
     phase_M->SetParameters(R_2, R_L2, L_2, C_2);
@@ -285,13 +286,13 @@ void plotPhase()
     phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
 
     // fit
-    p_source->Fit(phase_S);
+    // p_source->Fit(phase_S);
     p_woofer->Fit(phase_W);
     p_tweeter->Fit(phase_T);
     p_mid->Fit(phase_M);
 
     // disegna le funzioni sullo stesso grafico
-    phase_S->Draw("same");
+    // phase_S->Draw("same");
     phase_W->Draw("same");
     phase_T->Draw("same");
     phase_M->Draw("same");
@@ -303,7 +304,7 @@ void plotPhase()
     leg->AddEntry(p_woofer, "woofer", "P");
     leg->AddEntry(p_tweeter, "tweeter", "P");
     leg->AddEntry(p_mid, "mid", "P");
-    leg->AddEntry(phase_S, "source TF", "L");
+    // leg->AddEntry(phase_S, "source TF", "L");
     leg->AddEntry(phase_W, "woofer TF", "L");
     leg->AddEntry(phase_T, "tweeter TF", "L");
     leg->AddEntry(phase_M, "mid TF", "L");
