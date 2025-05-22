@@ -16,6 +16,13 @@ constexpr double C_2{1.01E-08};
 constexpr double L_2{4.64E-02};
 constexpr double V_0{2.5};
 constexpr double R_gen{50};
+constexpr double delta_R_1{0.55};
+constexpr double delta_L_1{5.34E-4};
+constexpr double delta_C_1{1.01e-10};
+constexpr double delta_R_L2{0.19};
+constexpr double delta_R_2{1.67};
+constexpr double delta_C_2{1.01e-10};
+constexpr double delta_L_2{0.19};
 
 double V_S(double *f, double *par)
 {
@@ -44,30 +51,31 @@ double V_S(double *f, double *par)
 double V_W(double *f, double *par)
 {
     double W = 2 * TMath::Pi() * f[0];
-    double R = par[0];
     double L = par[1];
+    double R = par[3];
 
-    return R / std::sqrt((R * R + W * W * L * L));
+    return V_S(f, par) * R / std::sqrt((R * R + W * W * L * L));
 }
 
 double V_T(double *f, double *par)
 {
     double W = 2 * TMath::Pi() * f[0];
-    double R = par[0];
-    double C = par[1];
+    double C = par[2];
+    double R = par[3];
 
-    return R / std::sqrt(R * R + 1 / (W * W * C * C));
+    return V_S(f, par) * R / std::sqrt(R * R + 1 / (W * W * C * C));
 }
 
 double V_M(double *f, double *par)
 {
     double W = 2 * TMath::Pi() * f[0];
-    double R = par[0];
-    double RL = par[1];
-    double L = par[2];
-    double C = par[3];
 
-    return R / std::sqrt((R + RL) * (R + RL) + (W * L - 1 / (W * C)) * (W * L - 1 / (W * C)));
+    double L = par[4];
+    double C = par[5];
+    double RL = par[6];
+    double R = par[7];
+
+    return V_S(f, par) * R / std::sqrt((R + RL) * (R + RL) + (W * L - 1 / (W * C)) * (W * L - 1 / (W * C)));
 }
 
 // Funzioni di fase
@@ -105,35 +113,6 @@ double p_M(double *f, double *par)
     return deg(-atan2(W * L - 1 / (W * C), R + RL));
 }
 
-/*double sourceTF(double *x, double *par)
-{
-    double f = x[0]; // qua cosa mettiamo?
-    return 0.0;
-}
-
-double wooferTF(double *x, double *par)
-{
-    double f = x[0];
-    return R_W * V_0 / std::sqrt((R_LW + R_W) * (R_LW + R_W) + (f * f * L_W * L_W));
-    return 0.0;
-}
-
-double tweeterTF(double *x, double *par)
-{
-    double f = x[0];
-    return R_T * V_0 / std::sqrt(R_T * R_T + 1 / (f * f * C_T * C_T));
-    return 0.0;
-}
-
-double midTF(double *x, double *par)
-{
-    double f = x[0];
-    return R_M * V_0 / std::sqrt((R_M + R_LM) * (R_M + R_LM) + (f * L_M - 1 / (f * C_M)) * (f * L_M - 1 / (f * C_M)));
-    return 0.0;
-}
-
-*/
-
 void plotAmplitude()
 {
     // canvas
@@ -146,17 +125,17 @@ void plotAmplitude()
     TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
-    g_source->SetMarkerStyle(20);
-    g_woofer->SetMarkerStyle(20);
-    g_tweeter->SetMarkerStyle(20);
-    g_mid->SetMarkerStyle(20);
+    g_source->SetMarkerStyle(1);
+    g_woofer->SetMarkerStyle(1);
+    g_tweeter->SetMarkerStyle(1);
+    g_mid->SetMarkerStyle(1);
     g_source->SetMarkerColor(kRed);
     g_woofer->SetMarkerColor(kBlue);
     g_tweeter->SetMarkerColor(kGreen);
     g_mid->SetMarkerColor(kMagenta);
 
     // titoli e assi
-    g_source->SetTitle("Filtro CrossOver;Frequency [Hz];#Delta V [V]");
+    g_source->SetTitle("Filtro CrossOver;Frequenza [Hz];Ampiezza [V]");
     g_source->SetMinimum(0);
     g_source->Draw("APE"); // primo grafico in canvas
     g_woofer->Draw("PE same");
@@ -169,12 +148,9 @@ void plotAmplitude()
 
     // TF1 per le funzioni (stile linea, senza marker)
     TF1 *f_S = new TF1("f_S", V_S, fmin, fmax, 9);
-    TF1 *f_W = new TF1("f_W", [&, f_S](double *f, double *par)
-                       { return f_S->Eval(f[0]) * V_W(f, par); }, fmin, fmax, 2);
-    TF1 *f_T = new TF1("f_T", [&, f_S](double *f, double *par)
-                       { return f_S->Eval(f[0]) * V_T(f, par); }, fmin, fmax, 2);
-    TF1 *f_M = new TF1("f_M", [&, f_S](double *f, double *par)
-                       { return f_S->Eval(f[0]) * V_M(f, par); }, fmin, fmax, 4);
+    TF1 *f_W = new TF1("f_W", V_W, fmin, fmax, 9);
+    TF1 *f_T = new TF1("f_T", V_T, fmin, fmax, 9);
+    TF1 *f_M = new TF1("f_M", V_M, fmin, fmax, 9);
 
     // colori e stile linea
     f_S->SetLineColor(kRed + 1);
@@ -187,16 +163,23 @@ void plotAmplitude()
     f_M->SetLineWidth(3);
 
     // parametri delle funzioni
-    f_S->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
-    f_W->SetParameters(R_1, L_1);
-    f_T->SetParameters(R_1, C_1);
-    f_M->SetParameters(R_2, R_L2, L_2, C_2);
-    f_S->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
-    f_W->SetParNames("R_1", "L_1");
-    f_T->SetParNames("R_1", "C_1");
-    f_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
-    f_W->SetParLimits(0, R_1 - 5 * 0.55, R_1 + 5 * 0.55);
-    f_W->SetParLimits(1, L_1 - 5 * 5.3e-4, L_1 + 5 * 5.3e-4);
+    TF1 *f[4] = {f_S, f_W, f_T, f_M};
+    for (int i = 0; i < 4; ++i)
+    {
+        f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
+        f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
+
+        f[i]->FixParameter(0, V_0);
+        f[i]->SetParLimits(1, L_1 - 5 * delta_L_1, L_1 + 5 * delta_L_1);
+        f[i]->SetParLimits(2, C_1 - 5 * delta_C_1, C_1 + 5 * delta_C_1);
+        f[i]->SetParLimits(3, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
+        f[i]->SetParLimits(4, L_2 - 5 * delta_L_2, L_2 + 5 * delta_L_2);
+        f[i]->SetParLimits(5, C_2 - 5 * delta_C_2, C_2 + 5 * delta_C_2);
+        f[i]->SetParLimits(6, R_L2 - 5 * delta_R_L2, R_L2 + 5 * delta_R_L2);
+        f[i]->SetParLimits(7, R_2 - 5 * delta_R_2, R_2 + 5 * delta_R_2);
+        f[i]->FixParameter(8, 56.5);
+        // f[i]->SetParLimits(8, 0, 100);
+    }
 
     // fit
     g_source->Fit(f_S);
@@ -238,10 +221,10 @@ void plotPhase()
     TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
-    p_source->SetMarkerStyle(20);
-    p_woofer->SetMarkerStyle(20);
-    p_tweeter->SetMarkerStyle(20);
-    p_mid->SetMarkerStyle(20);
+    p_source->SetMarkerStyle(1);
+    p_woofer->SetMarkerStyle(1);
+    p_tweeter->SetMarkerStyle(1);
+    p_mid->SetMarkerStyle(1);
     p_source->SetMarkerColor(kRed);
     p_woofer->SetMarkerColor(kBlue);
     p_tweeter->SetMarkerColor(kGreen);
@@ -261,14 +244,14 @@ void plotPhase()
     double fmax = p_source->GetXaxis()->GetXmax();
 
     // TF1 per le funzioni (stile linea, senza marker)
-    // TF1 *phase_S = new TF1("phase_S", "[0]", fmin, fmax, 1);
+    TF1 *phase_S = new TF1("phase_S", "pol0", fmin, fmax);
     TF1 *phase_W = new TF1("phase_W", p_W, fmin, fmax, 2);
     TF1 *phase_T = new TF1("phase_T", p_T, fmin, fmax, 2);
     TF1 *phase_M = new TF1("phase_M", p_M, fmin, fmax, 4);
 
     // colori e stile linea
-    // phase_S->SetLineColor(kRed + 1);
-    // phase_S->SetLineWidth(3);
+    phase_S->SetLineColor(kRed + 1);
+    phase_S->SetLineWidth(3);
     phase_W->SetLineColor(kBlue + 1);
     phase_W->SetLineWidth(3);
     phase_T->SetLineColor(kGreen + 1);
@@ -277,22 +260,30 @@ void plotPhase()
     phase_M->SetLineWidth(3);
 
     // parametri delle funzioni
-    // phase_S->SetParameters(0.);
+    phase_S->SetParameters(0.);
     phase_W->SetParameters(R_1, L_1);
     phase_T->SetParameters(R_1, C_1);
     phase_M->SetParameters(R_2, R_L2, L_2, C_2);
+    phase_S->SetParNames("offset");
     phase_W->SetParNames("R_1", "L_1");
     phase_T->SetParNames("R_1", "C_1");
     phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
+    phase_W->SetParLimits(0, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
+    phase_W->SetParLimits(1, L_1 - 5 * delta_L_1, L_1 + 5 * delta_L_1);
+    phase_T->SetParLimits(0, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
+    phase_T->SetParLimits(1, C_1 - 5 * delta_C_1, C_1 + 5 * delta_C_1);
+    phase_M->SetParLimits(0, R_2 - 5 * delta_R_2, R_2 + 5 * delta_R_2);
+    phase_M->SetParLimits(1, R_L2 - 5 * delta_R_L2, R_L2 + 5 * delta_R_L2);
+    phase_M->SetParLimits(2, L_2 - 5 * delta_L_2, L_2 + 5 * delta_L_2);
+    phase_M->SetParLimits(3, C_2 - 5 * delta_C_2, C_2 + 5 * delta_C_2);
 
-    // fit
-    // p_source->Fit(phase_S);
+    p_source->Fit(phase_S);
     p_woofer->Fit(phase_W);
     p_tweeter->Fit(phase_T);
     p_mid->Fit(phase_M);
 
     // disegna le funzioni sullo stesso grafico
-    // phase_S->Draw("same");
+    phase_S->Draw("same");
     phase_W->Draw("same");
     phase_T->Draw("same");
     phase_M->Draw("same");
@@ -304,10 +295,10 @@ void plotPhase()
     leg->AddEntry(p_woofer, "woofer", "P");
     leg->AddEntry(p_tweeter, "tweeter", "P");
     leg->AddEntry(p_mid, "mid", "P");
-    // leg->AddEntry(phase_S, "source TF", "L");
-    leg->AddEntry(phase_W, "woofer TF", "L");
-    leg->AddEntry(phase_T, "tweeter TF", "L");
-    leg->AddEntry(phase_M, "mid TF", "L");
+    leg->AddEntry(phase_S, "source fit", "L");
+    leg->AddEntry(phase_W, "woofer fit", "L");
+    leg->AddEntry(phase_T, "tweeter fit", "L");
+    leg->AddEntry(phase_M, "mid fit", "L");
     leg->Draw();
 
     c->Update();
