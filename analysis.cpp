@@ -143,8 +143,11 @@ void plotAmplitude()
     g_mid->Draw("PE same");
 
     // recupera estremo di frequenza per disegnare le funzioni
-    double fmin = g_source->GetXaxis()->GetXmin();
-    double fmax = g_source->GetXaxis()->GetXmax();
+    // double fmin = g_source->GetXaxis()->GetXmin();
+    // double fmax = g_source->GetXaxis()->GetXmax();
+    double fmin = 6000.;  // ristretto range del fit
+    double fmax = 8500.;
+
 
     // TF1 per le funzioni (stile linea, senza marker)
     TF1 *f_S = new TF1("f_S", V_S, fmin, fmax, 9);
@@ -163,29 +166,46 @@ void plotAmplitude()
     f_M->SetLineWidth(3);
 
     // parametri delle funzioni
-    TF1 *f[4] = {f_S, f_W, f_T, f_M};
+    // TF1 *f[4] = {f_S, f_W, f_T, f_M};
+    // for (int i = 0; i < 4; ++i)
+    // {
+    //     f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
+    //     f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
+
+    //     f[i]->FixParameter(0, V_0);
+    //     f[i]->SetParLimits(1, L_1 - 6 * delta_L_1, L_1 + 6 * delta_L_1);
+    //     f[i]->SetParLimits(2, C_1 - 6 * delta_C_1, C_1 + 6 * delta_C_1);
+    //     f[i]->SetParLimits(3, R_1 - 6 * delta_R_1, R_1 + 6 * delta_R_1);
+    //     f[i]->SetParLimits(4, L_2 - 6 * delta_L_2, L_2 + 6 * delta_L_2);
+    //     f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
+    //     f[i]->SetParLimits(6, R_L2- 6 * delta_R_L2, R_L2+6 * delta_R_L2);
+    //     f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
+    //     f[i]->FixParameter(8, 56.5);
+    // }
+
+        TF1 *f[4] = {f_S, f_W, f_T, f_M};
     for (int i = 0; i < 4; ++i)
     {
         f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
         f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
 
         f[i]->FixParameter(0, V_0);
-        f[i]->SetParLimits(1, L_1 - 5 * delta_L_1, L_1 + 5 * delta_L_1);
-        f[i]->SetParLimits(2, C_1 - 5 * delta_C_1, C_1 + 5 * delta_C_1);
-        f[i]->SetParLimits(3, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
-        f[i]->SetParLimits(4, L_2 - 5 * delta_L_2, L_2 + 5 * delta_L_2);
-        f[i]->SetParLimits(5, C_2 - 5 * delta_C_2, C_2 + 5 * delta_C_2);
-        f[i]->SetParLimits(6, R_L2 - 5 * delta_R_L2, R_L2 + 5 * delta_R_L2);
-        f[i]->SetParLimits(7, R_2 - 5 * delta_R_2, R_2 + 5 * delta_R_2);
-        f[i]->FixParameter(8, 56.5);
-        // f[i]->SetParLimits(8, 0, 100);
+        f[i]->SetParLimits(1, L_1 - 6 * delta_L_1, L_1 + 6 * delta_L_1);
+        f[i]->SetParLimits(2, C_1 - 6 * delta_C_1, C_1 + 6 * delta_C_1);
+        f[i]->SetParLimits(3, R_1 - 6 * delta_R_1, R_1 + 6 * delta_R_1);
+        f[i]->SetParLimits(4, L_2 - 6 * delta_L_2, L_2 + 6 * delta_L_2);
+        f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
+        f[i]->SetParLimits(6, R_L2- 6 * delta_R_L2, R_L2+6 * delta_R_L2);
+        f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
+        f[i]->FixParameter(8, 56.5);  // escludere midrange
     }
 
+
     // fit
-    g_source->Fit(f_S);
-    g_woofer->Fit(f_W);
-    g_tweeter->Fit(f_T);
-    g_mid->Fit(f_M);
+    g_source->Fit(f_S, "", "", fmin, fmax);
+    g_woofer->Fit(f_W, "", "", fmin, fmax);
+    g_tweeter->Fit(f_T, "", "",fmin, fmax);
+    g_mid->Fit(f_M, "", "", fmin, fmax);
 
     // disegna le funzioni sullo stesso grafico
     f_S->Draw("same");
@@ -240,8 +260,10 @@ void plotPhase()
     p_mid->Draw("PE same");
 
     // recupera estremo di frequenza per disegnare le funzioni
-    double fmin = p_source->GetXaxis()->GetXmin();
-    double fmax = p_source->GetXaxis()->GetXmax();
+    // double fmin = p_source->GetXaxis()->GetXmin();
+    // double fmax = p_source->GetXaxis()->GetXmax();
+    double fmin = 6000.;
+    double fmax = 8500.;
 
     // TF1 per le funzioni (stile linea, senza marker)
     TF1 *phase_S = new TF1("phase_S", "pol0", fmin, fmax);
@@ -268,19 +290,19 @@ void plotPhase()
     phase_W->SetParNames("R_1", "L_1");
     phase_T->SetParNames("R_1", "C_1");
     phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
-    phase_W->SetParLimits(0, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
-    phase_W->SetParLimits(1, L_1 - 5 * delta_L_1, L_1 + 5 * delta_L_1);
-    phase_T->SetParLimits(0, R_1 - 5 * delta_R_1, R_1 + 5 * delta_R_1);
-    phase_T->SetParLimits(1, C_1 - 5 * delta_C_1, C_1 + 5 * delta_C_1);
-    phase_M->SetParLimits(0, R_2 - 5 * delta_R_2, R_2 + 5 * delta_R_2);
-    phase_M->SetParLimits(1, R_L2 - 5 * delta_R_L2, R_L2 + 5 * delta_R_L2);
-    phase_M->SetParLimits(2, L_2 - 5 * delta_L_2, L_2 + 5 * delta_L_2);
-    phase_M->SetParLimits(3, C_2 - 5 * delta_C_2, C_2 + 5 * delta_C_2);
+    phase_W->SetParLimits(0, R_1 - 20* delta_R_1, R_1 + 20 * delta_R_1);
+    phase_W->SetParLimits(1, L_1 - 20* delta_L_1, L_1 + 20 * delta_L_1);
+    phase_T->SetParLimits(0, R_1 - 8* delta_R_1, R_1 + 8 * delta_R_1);
+    phase_T->SetParLimits(1, C_1 - 8* delta_C_1, C_1 + 8 * delta_C_1);
+    phase_M->SetParLimits(0, R_2 - 8* delta_R_2, R_2 + 8 * delta_R_2);
+    phase_M->SetParLimits(1, R_L2 -8* delta_R_L2, R_L2+8  * delta_R_L2);
+    phase_M->SetParLimits(2, L_2 - 8* delta_L_2, L_2 + 8 * delta_L_2);
+    phase_M->SetParLimits(3, C_2 - 8* delta_C_2, C_2 + 8 * delta_C_2);
 
-    p_source->Fit(phase_S);
-    p_woofer->Fit(phase_W);
-    p_tweeter->Fit(phase_T);
-    p_mid->Fit(phase_M);
+    p_source->Fit(phase_S, "", "", fmin, fmax);
+    p_woofer->Fit(phase_W, "", "", fmin, fmax);
+    p_tweeter->Fit(phase_T, "", "", fmin, fmax);
+    p_mid->Fit(phase_M, "", "", fmin, fmax);
 
     // disegna le funzioni sullo stesso grafico
     phase_S->Draw("same");
