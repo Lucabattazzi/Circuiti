@@ -320,3 +320,89 @@ void plotPhase()
 
     c->Update();
 }
+
+void amplitudeLinearFit() { // misurare frequenza di crossover dal grafico
+
+  TCanvas *c = new TCanvas("c", "Crossover Linear Fit", 800, 600);
+
+  TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_tweeter =
+      new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
+
+  // stile e colori dei marker
+  g_woofer->SetMarkerStyle(1);
+  g_tweeter->SetMarkerStyle(1);
+
+  g_woofer->SetMarkerColor(kBlue);
+  g_tweeter->SetMarkerColor(kGreen);
+
+  // titoli e assi
+  g_woofer->SetTitle("Filtro CrossOver;Frequenza [Hz];Ampiezza [V]");
+  g_woofer->GetXaxis()->SetRangeUser(4000, 12000);
+  g_woofer->Draw("APE"); // primo grafico in canvas
+  g_tweeter->Draw("PE same");
+
+  double fmin = 6900.; // ristretto range del fit
+  double fmax = 7700.;
+
+  // TF1 per le funzioni (stile linea, senza marker)
+  TF1 *line_W = new TF1("line_W", "[0]+[1]*x", fmin, fmax);
+  TF1 *line_T = new TF1("line_T", "[0]+[1]*x", fmin, fmax);
+
+  // colori e stile linea
+  line_W->SetLineColor(kBlue + 1);
+  line_W->SetLineWidth(3);
+  line_T->SetLineColor(kGreen + 1);
+  line_T->SetLineWidth(3);
+
+  // fit
+  std::cout << "Woofer fit";
+  g_woofer->Fit(line_W, "", "", fmin, fmax);
+  std::cout << "Tweeter fit";
+  g_tweeter->Fit(line_T, "", "", fmin, fmax);
+
+  // la x d'intersezione sarà x = - (a_T - a_W)/(b_T - b_W)
+  double a_W = line_W->GetParameter(0); // a intercetta, b slope
+  double b_W = line_W->GetParameter(1);
+  double a_T = line_T->GetParameter(0);
+  double b_T = line_T->GetParameter(1);
+  double da_W = line_W->GetParError(0);
+  double db_W = line_W->GetParError(1);
+  double da_T = line_T->GetParError(0);
+  double db_T = line_T->GetParError(1);
+
+  double denominator = b_T - b_W;
+  double crossover = -(a_T - a_W) / denominator;
+
+  double dx_da_W = -1. / denominator; // calcolo derivate
+  double dx_da_T = 1. / denominator;
+  double dx_db_W = -(a_T - a_W) / (denominator * denominator);
+  double dx_db_T = (a_T - a_W) / (denominator * denominator);
+
+  double delta_crossover =
+      sqrt(pow(dx_da_W * da_W, 2) + pow(dx_da_T * da_T, 2) +
+           pow(dx_db_W * db_W, 2) + pow(dx_db_T * db_T, 2));
+  std::cout << "\n========== CROSSOVER ==========" << std::endl;
+  std::cout << "Frequenza crossover: " << crossover << " Hz" << std::endl;
+  std::cout << "Errore su crossover: ±" << delta_crossover << " Hz"
+            << std::endl;
+
+  // disegna le funzioni sullo stesso grafico
+  line_W->Draw("same");
+  line_T->Draw("same");
+  TMarker *crossover_marker =
+      new TMarker(crossover, line_W->Eval(crossover), 20);
+  crossover_marker->SetMarkerColor(kRed);
+  crossover_marker->SetMarkerSize(1.2);
+  crossover_marker->Draw("same");
+
+  // legenda
+  TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
+  leg->SetBorderSize(0);
+  leg->AddEntry(crossover_marker, "Crossover", "P");
+  leg->AddEntry(line_W, "Woofer fit", "L");
+  leg->AddEntry(line_T, "Tweeter fit", "L");
+  leg->Draw();
+
+  c->Update();
+}
