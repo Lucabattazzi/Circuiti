@@ -4,6 +4,7 @@
 #include <TLegend.h>
 #include <cmath>
 #include <iostream>
+#include <iostream>
 #include <TComplex.h>
 #include <TMath.h>
 
@@ -119,16 +120,16 @@ void plotAmplitude()
     TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
     // leggi i file di dati con errori su x e y
-    TGraphErrors *g_source = new TGraphErrors("V_source.txt", "%lg %lg %lg %lg");
-    TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
-    TGraphErrors *g_tweeter = new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
-    TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_source = new TGraphErrors("data/V_source.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_woofer = new TGraphErrors("data/V_woofer.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_tweeter = new TGraphErrors("data/V_tweeter.txt", "%lg %lg %lg %lg");
+    TGraphErrors *g_mid = new TGraphErrors("data/V_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
-    g_source->SetMarkerStyle(1);
-    g_woofer->SetMarkerStyle(1);
-    g_tweeter->SetMarkerStyle(1);
-    g_mid->SetMarkerStyle(1);
+    g_source->SetMarkerStyle(6);
+    g_woofer->SetMarkerStyle(6);
+    g_tweeter->SetMarkerStyle(6);
+    g_mid->SetMarkerStyle(6);
     g_source->SetMarkerColor(kRed);
     g_woofer->SetMarkerColor(kBlue);
     g_tweeter->SetMarkerColor(kGreen);
@@ -156,18 +157,34 @@ void plotAmplitude()
 
     // colori e stile linea
     f_S->SetLineColor(kRed + 1);
-    f_S->SetLineWidth(3);
     f_W->SetLineColor(kBlue + 1);
-    f_W->SetLineWidth(3);
     f_T->SetLineColor(kGreen + 1);
-    f_T->SetLineWidth(3);
     f_M->SetLineColor(kMagenta + 1);
     f_M->SetLineWidth(3);
 
+    // parametri delle funzioni
+    // TF1 *f[4] = {f_S, f_W, f_T, f_M};
+    // for (int i = 0; i < 4; ++i)
+    // {
+    //     f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
+    //     f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
 
+    //     f[i]->FixParameter(0, V_0);
+    //     f[i]->SetParLimits(1, L_1 - 6 * delta_L_1, L_1 + 6 * delta_L_1);
+    //     f[i]->SetParLimits(2, C_1 - 6 * delta_C_1, C_1 + 6 * delta_C_1);
+    //     f[i]->SetParLimits(3, R_1 - 6 * delta_R_1, R_1 + 6 * delta_R_1);
+    //     f[i]->SetParLimits(4, L_2 - 6 * delta_L_2, L_2 + 6 * delta_L_2);
+    //     f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
+    //     f[i]->SetParLimits(6, R_L2- 6 * delta_R_L2, R_L2+6 * delta_R_L2);
+    //     f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
+    //     f[i]->FixParameter(8, 56.5);
+    // }
+
+    TF1 *f[4] = {f_S, f_W, f_T, f_M};
     TF1 *f[4] = {f_S, f_W, f_T, f_M};
     for (int i = 0; i < 4; ++i)
     {
+        f[i]->SetLineWidth(3);
         f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
         f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2", "R_gen");
 
@@ -189,6 +206,11 @@ void plotAmplitude()
     g_tweeter->Fit(f_T, "", "", fmin, fmax);
     g_mid->Fit(f_M, "", "", fmin, fmax);
 
+    for (int i = 0; i < 4; ++i)
+    {
+        std::cout << "Function " << f[i]->GetName() << " reduced chi2: " << f[i]->GetChisquare() / f[i]->GetNDF() << '\n';
+    }
+
   for (int i = 0; i < 4; ++i)
     {
         std::cout << "Function " << f[i]->GetName() << " reduced chi2: " <<
@@ -204,9 +226,9 @@ void plotAmplitude()
     // legenda
     TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
     leg->SetBorderSize(0);
-    leg->AddEntry(g_source, "source", "P");
-    leg->AddEntry(g_woofer, "woofer", "P");
-    leg->AddEntry(g_tweeter, "tweeter", "P");
+    leg->AddEntry(g_source, "source", "LEP");
+    leg->AddEntry(g_woofer, "woofer", "LEP");
+    leg->AddEntry(g_tweeter, "tweeter", "LEP");
     leg->AddEntry(g_mid, "mid", "P");
     leg->AddEntry(f_S, "source fit", "L");
     leg->AddEntry(f_W, "woofer fit", "L");
@@ -223,16 +245,16 @@ void plotPhase()
     TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
     // leggi i file di dati con errori su x e y
-    TGraphErrors *p_source = new TGraphErrors("P_source.txt", "%lg %lg %lg %lg");
-    TGraphErrors *p_woofer = new TGraphErrors("P_woofer.txt", "%lg %lg %lg %lg");
-    TGraphErrors *p_tweeter = new TGraphErrors("P_tweeter.txt", "%lg %lg %lg %lg");
-    TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_source = new TGraphErrors("data/P_source.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_woofer = new TGraphErrors("data/P_woofer.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_tweeter = new TGraphErrors("data/P_tweeter.txt", "%lg %lg %lg %lg");
+    TGraphErrors *p_mid = new TGraphErrors("data/P_mid.txt", "%lg %lg %lg %lg");
 
     // stile e colori dei marker
-    p_source->SetMarkerStyle(1);
-    p_woofer->SetMarkerStyle(1);
-    p_tweeter->SetMarkerStyle(1);
-    p_mid->SetMarkerStyle(1);
+    p_source->SetMarkerStyle(6);
+    p_woofer->SetMarkerStyle(6);
+    p_tweeter->SetMarkerStyle(6);
+    p_mid->SetMarkerStyle(6);
     p_source->SetMarkerColor(kRed);
     p_woofer->SetMarkerColor(kBlue);
     p_tweeter->SetMarkerColor(kGreen);
@@ -278,14 +300,14 @@ void plotPhase()
     phase_W->SetParNames("R_1", "L_1");
     phase_T->SetParNames("R_1", "C_1");
     phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
-    phase_W->SetParLimits(0, R_1 - 20 * delta_R_1, R_1 + 20 * delta_R_1);
-    phase_W->SetParLimits(1, L_1 - 20 * delta_L_1, L_1 + 20 * delta_L_1);
-    phase_T->SetParLimits(0, R_1 - 8 * delta_R_1, R_1 + 8 * delta_R_1);
-    phase_T->SetParLimits(1, C_1 - 8 * delta_C_1, C_1 + 8 * delta_C_1);
-    phase_M->SetParLimits(0, R_2 - 8 * delta_R_2, R_2 + 8 * delta_R_2);
-    phase_M->SetParLimits(1, R_L2 - 8 * delta_R_L2, R_L2 + 8 * delta_R_L2);
-    phase_M->SetParLimits(2, L_2 - 8 * delta_L_2, L_2 + 8 * delta_L_2);
-    phase_M->SetParLimits(3, C_2 - 8 * delta_C_2, C_2 + 8 * delta_C_2);
+    phase_W->SetParLimits(0, R_1 - 20* delta_R_1, R_1 + 20 * delta_R_1);
+    phase_W->SetParLimits(1, L_1 - 20* delta_L_1, L_1 + 20 * delta_L_1);
+    phase_T->SetParLimits(0, R_1 - 8* delta_R_1, R_1 + 8 * delta_R_1);
+    phase_T->SetParLimits(1, C_1 - 8* delta_C_1, C_1 + 8 * delta_C_1);
+    phase_M->SetParLimits(0, R_2 - 8* delta_R_2, R_2 + 8 * delta_R_2);
+    phase_M->SetParLimits(1, R_L2 -8* delta_R_L2, R_L2+8  * delta_R_L2);
+    phase_M->SetParLimits(2, L_2 - 8* delta_L_2, L_2 + 8 * delta_L_2);
+    phase_M->SetParLimits(3, C_2 - 8* delta_C_2, C_2 + 8 * delta_C_2);
 
     p_source->Fit(phase_S, "", "", fmin, fmax);
     p_woofer->Fit(phase_W, "", "", fmin, fmax);
@@ -298,20 +320,13 @@ void plotPhase()
     phase_T->Draw("same");
     phase_M->Draw("same");
 
-    TF1 *phase[4] = {phase_S, phase_W, phase_T, phase_M};
-    for (int i = 0; i < 4; ++i)
-    {
-        std::cout << "Function " << phase[i]->GetName() << " reduced chi2: " <<
-        phase[i]->GetChisquare() / phase[i]->GetNDF() << '\n';
-    }
-
     // legenda
     TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
     leg->SetBorderSize(0);
-    leg->AddEntry(p_source, "source", "P");
-    leg->AddEntry(p_woofer, "woofer", "P");
-    leg->AddEntry(p_tweeter, "tweeter", "P");
-    leg->AddEntry(p_mid, "mid", "P");
+    leg->AddEntry(p_source, "source", "lep");
+    leg->AddEntry(p_woofer, "woofer", "lep");
+    leg->AddEntry(p_tweeter, "tweeter", "lep");
+    leg->AddEntry(p_mid, "mid", "lep");
     leg->AddEntry(phase_S, "source fit", "L");
     leg->AddEntry(phase_W, "woofer fit", "L");
     leg->AddEntry(phase_T, "tweeter fit", "L");
