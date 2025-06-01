@@ -110,11 +110,11 @@ void plotAmplitude() {
   TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
   // leggi i file di dati con errori su x e y
-  TGraphErrors *g_source = new TGraphErrors("V_source.txt", "%lg %lg %lg %lg");
-  TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_source = new TGraphErrors("data/V_source.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_woofer = new TGraphErrors("data/V_woofer.txt", "%lg %lg %lg %lg");
   TGraphErrors *g_tweeter =
-      new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
-  TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg %lg");
+      new TGraphErrors("data/V_tweeter.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_mid = new TGraphErrors("data/V_mid.txt", "%lg %lg %lg %lg");
 
   // stile e colori dei marker
   g_source->SetMarkerStyle(1);
@@ -257,10 +257,10 @@ void plotAmplitude() {
   // legenda
   TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
   leg->SetBorderSize(0);
-  leg->AddEntry(g_source, "source", "P");
-  leg->AddEntry(g_woofer, "woofer", "P");
-  leg->AddEntry(g_tweeter, "tweeter", "P");
-  leg->AddEntry(g_mid, "mid", "P");
+  leg->AddEntry(g_source, "source", "lep");
+  leg->AddEntry(g_woofer, "woofer", "lep");
+  leg->AddEntry(g_tweeter, "tweeter", "lep");
+  leg->AddEntry(g_mid, "mid", "lep");
   leg->AddEntry(f_S, "source TF", "L");
   leg->AddEntry(f_W, "woofer TF", "L");
   leg->AddEntry(f_T, "tweeter TF", "L");
@@ -275,11 +275,11 @@ void plotPhase() {
   TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
   // leggi i file di dati con errori su x e y
-  TGraphErrors *p_source = new TGraphErrors("P_source.txt", "%lg %lg %lg %lg");
-  TGraphErrors *p_woofer = new TGraphErrors("P_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_source = new TGraphErrors("data/P_source.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_woofer = new TGraphErrors("data/P_woofer.txt", "%lg %lg %lg %lg");
   TGraphErrors *p_tweeter =
-      new TGraphErrors("P_tweeter.txt", "%lg %lg %lg %lg");
-  TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg %lg");
+      new TGraphErrors("data/P_tweeter.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_mid = new TGraphErrors("data/P_mid.txt", "%lg %lg %lg %lg");
 
   // stile e colori dei marker
   p_source->SetMarkerStyle(1);
@@ -357,10 +357,10 @@ void plotPhase() {
   // legenda
   TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
   leg->SetBorderSize(0);
-  leg->AddEntry(p_source, "source", "P");
-  leg->AddEntry(p_woofer, "woofer", "P");
-  leg->AddEntry(p_tweeter, "tweeter", "P");
-  leg->AddEntry(p_mid, "mid", "P");
+  leg->AddEntry(p_source, "source", "lep");
+  leg->AddEntry(p_woofer, "woofer", "lep");
+  leg->AddEntry(p_tweeter, "tweeter", "lep");
+  leg->AddEntry(p_mid, "mid", "lep");
   leg->AddEntry(phase_S, "source fit", "L");
   leg->AddEntry(phase_W, "woofer fit", "L");
   leg->AddEntry(phase_T, "tweeter fit", "L");

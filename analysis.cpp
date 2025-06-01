@@ -1,5 +1,6 @@
 #include <TCanvas.h>
 #include <TGraphErrors.h>
+#include <TMarker.h>
 #include <TF1.h>
 #include <TLegend.h>
 #include <cmath>
@@ -204,10 +205,10 @@ void plotAmplitude()
     // legenda
     TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
     leg->SetBorderSize(0);
-    leg->AddEntry(g_source, "source", "P");
-    leg->AddEntry(g_woofer, "woofer", "P");
-    leg->AddEntry(g_tweeter, "tweeter", "P");
-    leg->AddEntry(g_mid, "mid", "P");
+    leg->AddEntry(g_source, "source", "lep");
+    leg->AddEntry(g_woofer, "woofer", "lep");
+    leg->AddEntry(g_tweeter, "tweeter", "lep");
+    leg->AddEntry(g_mid, "mid", "lep");
     leg->AddEntry(f_S, "source fit", "L");
     leg->AddEntry(f_W, "woofer fit", "L");
     leg->AddEntry(f_T, "tweeter fit", "L");
@@ -250,8 +251,6 @@ void plotPhase()
     // recupera estremo di frequenza per disegnare le funzioni
     // double fmin = p_source->GetXaxis()->GetXmin();
     // double fmax = p_source->GetXaxis()->GetXmax();
-    double fmin = 4000.;
-    double fmax = 15000.;
     double fmin = 4000.;
     double fmax = 15000.;
 
@@ -327,9 +326,9 @@ void amplitudeLinearFit() { // misurare frequenza di crossover dal grafico
 
   TCanvas *c = new TCanvas("c", "Crossover Linear Fit", 800, 600);
 
-  TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_woofer = new TGraphErrors("data/V_woofer.txt", "%lg %lg %lg %lg");
   TGraphErrors *g_tweeter =
-      new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
+      new TGraphErrors("data/V_tweeter.txt", "%lg %lg %lg %lg");
 
   // stile e colori dei marker
   g_woofer->SetMarkerStyle(1);
@@ -401,7 +400,7 @@ void amplitudeLinearFit() { // misurare frequenza di crossover dal grafico
   // legenda
   TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
   leg->SetBorderSize(0);
-  leg->AddEntry(crossover_marker, "Crossover", "P");
+  leg->AddEntry(crossover_marker, "Crossover", "lep");
   leg->AddEntry(line_W, "Woofer fit", "L");
   leg->AddEntry(line_T, "Tweeter fit", "L");
   leg->Draw();
