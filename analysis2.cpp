@@ -110,17 +110,17 @@ void plotAmplitude() {
   TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
   // leggi i file di dati con errori su x e y
-  TGraphErrors *g_source = new TGraphErrors("data/V_source.txt", "%lg %lg %lg %lg");
-  TGraphErrors *g_woofer = new TGraphErrors("data/V_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_source = new TGraphErrors("V_source.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
   TGraphErrors *g_tweeter =
-      new TGraphErrors("data/V_tweeter.txt", "%lg %lg %lg %lg");
-  TGraphErrors *g_mid = new TGraphErrors("data/V_mid.txt", "%lg %lg %lg %lg");
+      new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_mid = new TGraphErrors("V_mid.txt", "%lg %lg %lg %lg");
 
   // stile e colori dei marker
-  g_source->SetMarkerStyle(1);
-  g_woofer->SetMarkerStyle(1);
-  g_tweeter->SetMarkerStyle(1);
-  g_mid->SetMarkerStyle(1);
+  g_source->SetMarkerStyle(6);
+  g_woofer->SetMarkerStyle(6);
+  g_tweeter->SetMarkerStyle(6);
+  g_mid->SetMarkerStyle(6);
   g_source->SetMarkerColor(kRed);
   g_woofer->SetMarkerColor(kBlue);
   g_tweeter->SetMarkerColor(kGreen);
@@ -156,26 +156,7 @@ void plotAmplitude() {
   f_M->SetLineColor(kMagenta + 1);
   f_M->SetLineWidth(3);
 
-  // parametri delle funzioni
-  // TF1 *f[4] = {f_S, f_T};
-  // for (int i = 0; i < 2; ++i)
-  // {
-  //     f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
-  //     f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2",
-  //     "R_2", "R_gen");
-
-  //     f[i]->FixParameter(0, V_0);
-  //     f[i]->SetParLimits(1, L_1 - 6 * delta_L_1, L_1 + 6 * delta_L_1);
-  //     f[i]->SetParLimits(2, C_1 - 6 * delta_C_1, C_1 + 6 * delta_C_1);
-  //     f[i]->SetParLimits(3, R_1 - 6 * delta_R_1, R_1 + 6 * delta_R_1);
-  //     f[i]->SetParLimits(4, L_2 - 6 * delta_L_2, L_2 + 6 * delta_L_2);
-  //     f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
-  //     f[i]->SetParLimits(6, R_L2- 6 * delta_R_L2, R_L2+6 * delta_R_L2);
-  //     f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
-  //     f[i]->FixParameter(8, 56.5);
-  // }
-
-  TF1 *f[2]= {f_S, f_T};
+  TF1 *f[2] = {f_S, f_T};
   for (int i = 0; i < 2; ++i) {
     f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
     f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2",
@@ -189,7 +170,7 @@ void plotAmplitude() {
     f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
     f[i]->SetParLimits(6, R_L2 - 6 * delta_R_L2, R_L2 + 6 * delta_R_L2);
     f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
-    f[i]->FixParameter(8, 56.5); 
+    f[i]->FixParameter(8, 56.5);
   }
 
   // midrange
@@ -202,41 +183,25 @@ void plotAmplitude() {
   f_M->SetParLimits(3, R_1 - 30 * delta_R_1, R_1 + 30 * delta_R_1);
   f_M->SetParLimits(4, L_2 - 30 * delta_L_2, L_2 + 30 * delta_L_2);
   f_M->SetParLimits(5, C_2 - 30 * delta_C_2, C_2 + 30 * delta_C_2);
-  f_M->SetParLimits(6, R_L2 -30 * delta_R_L2, R_L2+30 * delta_R_L2);
+  f_M->SetParLimits(6, R_L2 - 30 * delta_R_L2, R_L2 + 30 * delta_R_L2);
   f_M->SetParLimits(7, R_2 - 30 * delta_R_2, R_2 + 30 * delta_R_2);
-  f_M->SetParLimits(8, 56.5+10, 56.5-10);
+  f_M->SetParLimits(8, 56.5 + 10, 56.5 - 10);
 
   // woofer
   f_W->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
   f_W->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2", "R_2",
                    "R_gen");
-  f_W->FixParameter(0, V_0);
-  f_W->SetParLimits(1, L_1 - 30 * delta_L_1, L_1 + 30 * delta_L_1);
-  f_W->SetParLimits(2, C_1 - 30 * delta_C_1, C_1 + 30 * delta_C_1);
-  f_W->SetParLimits(3, R_1 - 30 * delta_R_1, R_1 + 30 * delta_R_1);
-  f_W->SetParLimits(4, L_2 - 30 * delta_L_2, L_2 + 30 * delta_L_2);
-  f_W->SetParLimits(5, C_2 - 30 * delta_C_2, C_2 + 30 * delta_C_2);
-  f_W->SetParLimits(6, R_L2 -30 * delta_R_L2, R_L2+30 * delta_R_L2);
-  f_W->SetParLimits(7, R_2 - 30 * delta_R_2, R_2 + 30 * delta_R_2);
-  f_W->SetParameter(8, 56.5); // escludere midrange
-
-  //     TF1 *f[4] = {f_S, f_W, f_T, f_M};
-  // for (int i = 0; i < 4; ++i)
-  // {
-  //     f[i]->SetParameters(V_0, L_1, C_1, R_1, L_2, C_2, R_L2, R_2, R_gen);
-  //     f[i]->SetParNames("V_0", "L_1", "C_1", "R_1", "L_2", "C_2", "R_L2",
-  //     "R_2", "R_gen");
-
-  //     f[i]->FixParameter(0, V_0);
-  //     f[i]->SetParLimits(1, L_1 - 6 * delta_L_1, L_1 + 6 * delta_L_1);
-  //     f[i]->SetParLimits(2, C_1 - 6 * delta_C_1, C_1 + 6 * delta_C_1);
-  //     f[i]->SetParLimits(3, R_1 - 6 * delta_R_1, R_1 + 6 * delta_R_1);
-  //     f[i]->SetParLimits(4, L_2 - 6 * delta_L_2, L_2 + 6 * delta_L_2);
-  //     f[i]->SetParLimits(5, C_2 - 6 * delta_C_2, C_2 + 6 * delta_C_2);
-  //     f[i]->SetParLimits(6, R_L2- 6 * delta_R_L2, R_L2+6 * delta_R_L2);
-  //     f[i]->SetParLimits(7, R_2 - 6 * delta_R_2, R_2 + 6 * delta_R_2);
-  //     f[i]->FixParameter(8, 56.5);  // escludere midrange
-  // }
+  f_W->SetParLimits(0, V_0 - 0.15, V_0 + 0.15);
+  // f_W->FixParameter(0, V_0);
+  f_W->SetParLimits(1, L_1 - 100 * delta_L_1, L_1 + 100 * delta_L_1);
+  f_W->SetParLimits(2, C_1 - 60 * delta_C_1, C_1 + 60 * delta_C_1);
+  f_W->SetParLimits(3, R_1 - 100 * delta_R_1, R_1 + 100 * delta_R_1);
+  f_W->SetParLimits(4, L_2 - 60 * delta_L_2, L_2 + 60 * delta_L_2);
+  f_W->SetParLimits(5, C_2 - 60 * delta_C_2, C_2 + 60 * delta_C_2);
+  f_W->SetParLimits(6, R_L2 - 60 * delta_R_L2, R_L2 + 60 * delta_R_L2);
+  f_W->SetParLimits(7, R_2 - 60 * delta_R_2, R_2 + 60 * delta_R_2);
+  // f_W->SetParLimits(8, 56.5, 56.5);
+  f_W->FixParameter(8, 56.5);
 
   // fit
   std::cout << "Source fit";
@@ -253,18 +218,109 @@ void plotAmplitude() {
   f_W->Draw("same");
   f_T->Draw("same");
   f_M->Draw("same");
+  std::cout << "Source minimum: " << f_S->GetMinimumX() << "\n";
+  std::cout
+      << "Midrange maximum: " << f_M->GetMaximumX() << "+/-"
+      << " 50 Hz"
+      << "\n"; // da associare errore pari a metà risoluzione di sweep -> 50 Hz
 
   // legenda
   TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
   leg->SetBorderSize(0);
-  leg->AddEntry(g_source, "source", "lep");
-  leg->AddEntry(g_woofer, "woofer", "lep");
-  leg->AddEntry(g_tweeter, "tweeter", "lep");
-  leg->AddEntry(g_mid, "mid", "lep");
-  leg->AddEntry(f_S, "source TF", "L");
-  leg->AddEntry(f_W, "woofer TF", "L");
-  leg->AddEntry(f_T, "tweeter TF", "L");
-  leg->AddEntry(f_M, "mid TF", "L");
+  leg->AddEntry(g_source, "source", "LEP");
+  leg->AddEntry(g_woofer, "woofer", "LEP");
+  leg->AddEntry(g_tweeter, "tweeter", "LEP");
+  leg->AddEntry(g_mid, "mid", "LEP");
+  leg->AddEntry(f_S, "source fit", "L");
+  leg->AddEntry(f_W, "woofer fit", "L");
+  leg->AddEntry(f_T, "tweeter fit", "L");
+  leg->AddEntry(f_M, "mid fit", "L");
+  leg->Draw();
+
+  c->Update();
+}
+
+void amplitudeLinearFit() { // misurare frequenza di crossover dal grafico
+
+  TCanvas *c = new TCanvas("c", "Crossover Linear Fit", 800, 600);
+
+  TGraphErrors *g_woofer = new TGraphErrors("V_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *g_tweeter =
+      new TGraphErrors("V_tweeter.txt", "%lg %lg %lg %lg");
+
+  // stile e colori dei marker
+  g_woofer->SetMarkerStyle(1);
+  g_tweeter->SetMarkerStyle(1);
+
+  g_woofer->SetMarkerColor(kBlue);
+  g_tweeter->SetMarkerColor(kGreen);
+
+  // titoli e assi
+  g_woofer->SetTitle("Filtro CrossOver;Frequenza [Hz];Ampiezza [V]");
+  g_woofer->GetXaxis()->SetRangeUser(4000, 12000);
+  g_woofer->Draw("APE"); // primo grafico in canvas
+  g_tweeter->Draw("PE same");
+
+  double fmin = 6850.; // ristretto range del fit
+  double fmax = 7650.;
+
+  // TF1 per le funzioni (stile linea, senza marker)
+  TF1 *line_W = new TF1("line_W", "[0]+[1]*x", fmin, fmax);
+  TF1 *line_T = new TF1("line_T", "[0]+[1]*x", fmin, fmax);
+
+  // colori e stile linea
+  line_W->SetLineColor(kBlue + 1);
+  line_W->SetLineWidth(3);
+  line_T->SetLineColor(kGreen + 1);
+  line_T->SetLineWidth(3);
+
+  // fit
+  std::cout << "Woofer fit";
+  g_woofer->Fit(line_W, "", "", fmin, fmax);
+  std::cout << "Tweeter fit";
+  g_tweeter->Fit(line_T, "", "", fmin, fmax);
+
+  // la x d'intersezione sarà x = - (a_T - a_W)/(b_T - b_W)
+  double a_W = line_W->GetParameter(0); // a intercetta, b slope
+  double b_W = line_W->GetParameter(1);
+  double a_T = line_T->GetParameter(0);
+  double b_T = line_T->GetParameter(1);
+  double da_W = line_W->GetParError(0);
+  double db_W = line_W->GetParError(1);
+  double da_T = line_T->GetParError(0);
+  double db_T = line_T->GetParError(1);
+
+  double denominator = b_T - b_W;
+  double crossover = -(a_T - a_W) / denominator;
+
+  double dx_da_W = -1. / denominator; // calcolo derivate
+  double dx_da_T = 1. / denominator;
+  double dx_db_W = -(a_T - a_W) / (denominator * denominator);
+  double dx_db_T = (a_T - a_W) / (denominator * denominator);
+
+  double delta_crossover =
+      sqrt(pow(dx_da_W * da_W, 2) + pow(dx_da_T * da_T, 2) +
+           pow(dx_db_W * db_W, 2) + pow(dx_db_T * db_T, 2));
+  std::cout << "\n========== CROSSOVER ==========" << std::endl;
+  std::cout << "Frequenza crossover: " << crossover << " Hz" << std::endl;
+  std::cout << "Errore su crossover: ±" << delta_crossover << " Hz"
+            << std::endl;
+
+  // disegna le funzioni sullo stesso grafico
+  line_W->Draw("same");
+  line_T->Draw("same");
+  TMarker *crossover_marker =
+      new TMarker(crossover, line_W->Eval(crossover), 20);
+  crossover_marker->SetMarkerColor(kRed);
+  crossover_marker->SetMarkerSize(1.2);
+  crossover_marker->Draw("same");
+
+  // legenda
+  TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
+  leg->SetBorderSize(0);
+  leg->AddEntry(crossover_marker, "Crossover", "P");
+  leg->AddEntry(line_W, "Woofer fit", "L");
+  leg->AddEntry(line_T, "Tweeter fit", "L");
   leg->Draw();
 
   c->Update();
@@ -275,17 +331,17 @@ void plotPhase() {
   TCanvas *c = new TCanvas("c", "Crossover Analysis", 800, 600);
 
   // leggi i file di dati con errori su x e y
-  TGraphErrors *p_source = new TGraphErrors("data/P_source.txt", "%lg %lg %lg %lg");
-  TGraphErrors *p_woofer = new TGraphErrors("data/P_woofer.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_source = new TGraphErrors("P_source.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_woofer = new TGraphErrors("P_woofer.txt", "%lg %lg %lg %lg");
   TGraphErrors *p_tweeter =
-      new TGraphErrors("data/P_tweeter.txt", "%lg %lg %lg %lg");
-  TGraphErrors *p_mid = new TGraphErrors("data/P_mid.txt", "%lg %lg %lg %lg");
+      new TGraphErrors("P_tweeter.txt", "%lg %lg %lg %lg");
+  TGraphErrors *p_mid = new TGraphErrors("P_mid.txt", "%lg %lg %lg %lg");
 
   // stile e colori dei marker
-  p_source->SetMarkerStyle(1);
-  p_woofer->SetMarkerStyle(1);
-  p_tweeter->SetMarkerStyle(1);
-  p_mid->SetMarkerStyle(1);
+  p_source->SetMarkerStyle(6);
+  p_woofer->SetMarkerStyle(6);
+  p_tweeter->SetMarkerStyle(6);
+  p_mid->SetMarkerStyle(6);
   p_source->SetMarkerColor(kRed);
   p_woofer->SetMarkerColor(kBlue);
   p_tweeter->SetMarkerColor(kGreen);
@@ -303,8 +359,8 @@ void plotPhase() {
   // recupera estremo di frequenza per disegnare le funzioni
   // double fmin = p_source->GetXaxis()->GetXmin();
   // double fmax = p_source->GetXaxis()->GetXmax();
-  double fmin = 4000.; // ristretto range del fit
-  double fmax = 10500.;
+  double fmin = 5000.; // ristretto range del fit
+  double fmax = 9500.;
 
   // TF1 per le funzioni (stile linea, senza marker)
   TF1 *phase_S = new TF1("phase_S", "pol0", fmin, fmax);
@@ -331,10 +387,10 @@ void plotPhase() {
   phase_W->SetParNames("R_1", "L_1");
   phase_T->SetParNames("R_1", "C_1");
   phase_M->SetParNames("R_2", "R_L2", "L_2", "C_2");
-  phase_W->SetParLimits(0, R_1 - 2 * delta_R_1, R_1 + 2 * delta_R_1);
-  phase_W->SetParLimits(1, L_1 - 30 * delta_L_1, L_1 + 30 * delta_L_1);
-  phase_T->SetParLimits(0, R_1 - 2 * delta_R_1, R_1 + 2 * delta_R_1);
-  phase_T->SetParLimits(1, C_1 - 1 * delta_C_1, C_1 + 1 * delta_C_1);
+  phase_W->SetParLimits(0, R_1 - 20 * delta_R_1, R_1 + 20 * delta_R_1);
+  phase_W->SetParLimits(1, L_1 - 20 * delta_L_1, L_1 + 20 * delta_L_1);
+  phase_T->SetParLimits(0, R_1 - 15 * delta_R_1, R_1 + 15 * delta_R_1);
+  phase_T->SetParLimits(1, C_1 - 15 * delta_C_1, C_1 + 15 * delta_C_1);
   phase_M->SetParLimits(0, R_2 - 8 * delta_R_2, R_2 + 8 * delta_R_2);
   phase_M->SetParLimits(1, R_L2 - 8 * delta_R_L2, R_L2 + 8 * delta_R_L2);
   phase_M->SetParLimits(2, L_2 - 8 * delta_L_2, L_2 + 8 * delta_L_2);
@@ -343,7 +399,7 @@ void plotPhase() {
   p_source->Fit(phase_S, "", "", fmin, fmax);
   std::cout << "Woofer fit";
   p_woofer->Fit(phase_W, "", "", fmin, fmax);
-  std::cout << "Tweeter fit fit";
+  std::cout << "Tweeter fit";
   p_tweeter->Fit(phase_T, "", "", fmin, fmax);
   std::cout << "Midrange fit";
   p_mid->Fit(phase_M, "", "", fmin, fmax);
@@ -354,13 +410,29 @@ void plotPhase() {
   phase_T->Draw("same");
   phase_M->Draw("same");
 
+  double line_max = 7700;
+  double line_min = 7000;
+
+  TF1 *line = new TF1("line_W", "[0]+[1]*x", line_min, line_max);
+  p_mid->Fit(line, "", "", line_min, line_max);
+  double a = line->GetParameter(0); // intercetta
+  double b = line->GetParameter(1); // coefficiente angolare
+  double ea = line->GetParError(0); // errore su a
+  double eb = line->GetParError(1); // errore su b
+  double x0 = -a / b;
+  double ex0 =
+      std::sqrt(std::pow(ea / b, 2) +
+                std::pow(a * eb / (b * b), 2)); // errori sommati in quadratura
+  std::cout << "Midrange zero = " << x0 << " ± " << ex0 << std::endl;
+  line->SetLineColor(kBlack);
+  line->Draw("same");
   // legenda
   TLegend *leg = new TLegend(0.65, 0.65, 0.90, 0.90);
   leg->SetBorderSize(0);
-  leg->AddEntry(p_source, "source", "lep");
-  leg->AddEntry(p_woofer, "woofer", "lep");
-  leg->AddEntry(p_tweeter, "tweeter", "lep");
-  leg->AddEntry(p_mid, "mid", "lep");
+  leg->AddEntry(p_source, "source", "LEP");
+  leg->AddEntry(p_woofer, "woofer", "LEP");
+  leg->AddEntry(p_tweeter, "tweeter", "LEP");
+  leg->AddEntry(p_mid, "mid", "LEP");
   leg->AddEntry(phase_S, "source fit", "L");
   leg->AddEntry(phase_W, "woofer fit", "L");
   leg->AddEntry(phase_T, "tweeter fit", "L");
